@@ -9,7 +9,7 @@ pipeline {
         stage('Pull Code') {
             steps {
                 dir('/home/ubuntu/pipedbackend') {
-                    git branch: 'main', url: 'https://github.com/DedSec2050/pipedbackend.git'
+                    git branch: 'master', url: 'https://github.com/DedSec2050/pipedbackend.git'
                 }
             }
         }

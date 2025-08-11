@@ -38,9 +38,9 @@ pipeline {
             steps {
                 echo "⚙️ Loading environment variables..."
                 sh """
-                    sudo mkdir -p ${DEPLOY_DIR}/pipedbackend
-                    sudo bash ${ENV_SCRIPT} | sudo tee ${DEPLOY_DIR}/pipedbackend/.env > /dev/null
-                    sudo chown ubuntu:ubuntu ${DEPLOY_DIR}/pipedbackend/.env
+                    sudo mkdir -p ${DEPLOY_DIR}
+                    sudo bash ${ENV_SCRIPT} | sudo tee ${DEPLOY_DIR}/.env > /dev/null
+                    sudo chown ubuntu:ubuntu ${DEPLOY_DIR}/.env
                 """
             }
         }

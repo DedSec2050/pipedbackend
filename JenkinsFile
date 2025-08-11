@@ -1,46 +1,57 @@
 pipeline {
     agent any
+
     environment {
-        APP_DIR = "/home/ubuntu/pipedbackend"
+        DEPLOY_DIR = "/home/ubuntu/pipedbackend"
+        SERVICE_NAME = "flaskapp"
         REPO_URL = "https://github.com/DedSec2050/pipedbackend.git"
         BRANCH = "master"
-        VENV_DIR = "${APP_DIR}/venv"
     }
-    
+
     stages {
         stage('Stop Service') {
             steps {
-                sh 'sudo systemctl stop flaskapp || true'
+                echo "🛑 Stopping $SERVICE_NAME..."
+                sh "sudo systemctl stop ${SERVICE_NAME} || true"
             }
         }
 
-        stage('Pull Code') {
+        stage('Checkout Code') {
             steps {
-                sh '''
-                    sudo mkdir -p ${APP_DIR}
-                    sudo chown -R jenkins:jenkins ${APP_DIR}
-                '''
-                dir("${APP_DIR}") {
-                    git branch: "${BRANCH}", url: "${REPO_URL}"
-                }
+                echo "📥 Cloning repository..."
+                git branch: "${BRANCH}", url: "${REPO_URL}"
+            }
+        }
+
+        stage('Deploy to Server Directory') {
+            steps {
+                echo "📂 Deploying to ${DEPLOY_DIR}..."
+                sh """
+                sudo rm -rf ${DEPLOY_DIR}
+                sudo mkdir -p ${DEPLOY_DIR}
+                sudo cp -r . ${DEPLOY_DIR}
+                sudo chown -R ubuntu:ubuntu ${DEPLOY_DIR}
+                """
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                echo "📦 Installing Python dependencies..."
                 sh """
-                    cd ${APP_DIR}
-                    python3 -m venv ${VENV_DIR}
-                    ${VENV_DIR}/bin/pip install --upgrade pip
-                    ${VENV_DIR}/bin/pip install -r requirements.txt
+                cd ${DEPLOY_DIR}
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install -r requirements.txt
+                deactivate
                 """
             }
         }
 
         stage('Start Service') {
             steps {
-                sh 'sudo systemctl daemon-reload'
-                sh 'sudo systemctl start flaskapp'
+                echo "🚀 Starting $SERVICE_NAME..."
+                sh "sudo systemctl start ${SERVICE_NAME}"
             }
         }
     }

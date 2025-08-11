@@ -27,9 +27,10 @@ pipeline {
             steps {
                 echo "📂 Deploying to ${DEPLOY_DIR}..."
                 sh """
+                mkdir -p build_tmp
+                cp -r ./* build_tmp/
                 sudo rm -rf ${DEPLOY_DIR}
-                sudo mkdir -p ${DEPLOY_DIR}
-                sudo cp -r . ${DEPLOY_DIR}
+                sudo mv build_tmp ${DEPLOY_DIR}
                 sudo chown -R ubuntu:ubuntu ${DEPLOY_DIR}
                 """
             }
@@ -39,9 +40,14 @@ pipeline {
             steps {
                 echo "📦 Installing Python dependencies..."
                 sh """
+                if [ ! -d ${DEPLOY_DIR} ]; then
+                    echo "❌ Deploy directory not found!"
+                    exit 1
+                fi
                 cd ${DEPLOY_DIR}
                 python3 -m venv venv
                 source venv/bin/activate
+                pip install --upgrade pip
                 pip install -r requirements.txt
                 deactivate
                 """

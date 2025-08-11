@@ -4,6 +4,7 @@ pipeline {
         DEPLOY_DIR = "/home/ubuntu/pipedbackend"
         SERVICE_NAME = "flaskapp"
         REPO_URL = "https://github.com/DedSec2050/pipedbackend.git"
+        ENV_SCRIPT = "/home/ubuntu/loadenv.sh" // Path where loadenv.sh is stored
     }
     stages {
         stage('Stop Service') {
@@ -29,6 +30,17 @@ pipeline {
                     sudo rm -rf ${DEPLOY_DIR}
                     sudo mv build_tmp ${DEPLOY_DIR}
                     sudo chown -R ubuntu:ubuntu ${DEPLOY_DIR}
+                """
+            }
+        }
+
+        stage('Load Environment Variables') {
+            steps {
+                echo "⚙️ Loading environment variables..."
+                sh """
+                    sudo mkdir -p ${DEPLOY_DIR}/appname
+                    sudo bash ${ENV_SCRIPT} > ${DEPLOY_DIR}/appname/.env
+                    sudo chown ubuntu:ubuntu ${DEPLOY_DIR}/appname/.env
                 """
             }
         }

@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    stages {
+        stage('Stop Service') {
+            steps {
+                sh 'sudo systemctl stop flaskapp || true'
+            }
+        }
+        stage('Pull Code') {
+            steps {
+                dir('/home/ubuntu/pipedbackend') {
+                    git branch: 'main', url: 'https://github.com/DedSec2050/pipedbackend.git'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                cd /home/ubuntu/pipedbackend
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install -r requirements.txt
+                deactivate
+                '''
+            }
+        }
+        stage('Start Service') {
+            steps {
+                sh 'sudo systemctl start flaskapp'
+            }
+        }
+    }
+}

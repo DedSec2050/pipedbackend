@@ -6,6 +6,7 @@ pipeline {
         BRANCH = "master"
         VENV_DIR = "${APP_DIR}/venv"
     }
+    
     stages {
         stage('Stop Service') {
             steps {

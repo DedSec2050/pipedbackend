@@ -61,6 +61,29 @@ python app.py
 
 Todo items are stored with the following structure:
 
+## Jenkins CI/CD Pipeline
+
+This project includes a Jenkins pipeline for automated deployment and CI/CD. The pipeline is defined in the `JenkinsFile` at the root of the repository.
+
+### Jenkins Pipeline Stages
+
+- **Stop Service**: Stops the running Flask service using `systemctl`.
+- **Checkout Code**: Pulls the latest code from the `master` branch of the repository.
+- **Deploy to Server Directory**: Copies the project files to the deployment directory on the server.
+- **Load Environment Variables**: Loads environment variables from a script (e.g., `/home/ubuntu/loadenv.sh`).
+- **Install Dependencies**: Sets up a Python virtual environment and installs dependencies from `requirements.txt`.
+- **Start Service**: Starts the Flask service using `systemctl`.
+
+### Usage
+
+1. **Configure Jenkins**: Ensure Jenkins is installed and has access to the server where the app will be deployed.
+2. **Set Up Credentials**: Make sure Jenkins can access the repository and has permissions to run commands on the server.
+3. **Environment Script**: Place your environment variable script at the specified path (default: `/home/ubuntu/loadenv.sh`).
+4. **Service File**: Ensure a `systemd` service file exists for your Flask app (e.g., `flaskapp.service`).
+5. **Run the Pipeline**: Trigger the Jenkins pipeline to deploy and start the backend automatically.
+
+You can customize the pipeline by editing the `JenkinsFile` as needed for your environment.
+
 ```json
 {
   "_id": "ObjectId",
